@@ -28,10 +28,11 @@ func ConvertToMp3(file tgbotapi.FileBytes) (string, error) {
 	return mp3file, res
 }
 
+// CreateFile creates a file
 func CreateFile(file tgbotapi.FileBytes) error {
 	localfile, errorCreateFile := os.Create(file.Name)
 	if errorCreateFile != nil {
-		panic(errorCreateFile)
+		fmt.Println(errorCreateFile)
 	}
 	defer localfile.Close()
 
