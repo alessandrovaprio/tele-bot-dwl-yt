@@ -52,7 +52,7 @@ Then run it:
 ```
 
 # Libraries
-Thanks to these libraries simplify my worklow:
+Thanks to these libraries, they simplified my worklow:
  - [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api)
  - [kkdai/youtube](https://github.com/kkdai/youtube)
 # License
