@@ -1,4 +1,4 @@
-module tele-bot-dwl-yt
+module github.com/alessandrovaprio/tele-bot-dwl-yt
 
 go 1.17
 

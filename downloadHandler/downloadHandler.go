@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	fh "tele-bot-dwl-yt/fileHandler"
+	fh "github.com/alessandrovaprio/tele-bot-dwl-yt/fileHandler"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/kkdai/youtube/v2"

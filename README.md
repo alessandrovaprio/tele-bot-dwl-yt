@@ -20,11 +20,11 @@ Send a youtube url, select a format (mp3 or .mpeg) and you'll receive it.
 
 ## Run Docker
 
-If you want to generate the docker image I provide a little script to run.
+If you want to generate the docker image I provide a Makefile (thanks to [rentziass](https://github.com/rentziass)).
 You have to change the script and insert your api-key (maybe is better if is an env variable)
 
 ``` 
-./create-docker-image-gh.sh 
+make
 ```
 
 Now you can start the image with:

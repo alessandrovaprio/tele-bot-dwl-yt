@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	dw "tele-bot-dwl-yt/downloadHandler"
+	dw "github.com/alessandrovaprio/tele-bot-dwl-yt/downloadHandler"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
