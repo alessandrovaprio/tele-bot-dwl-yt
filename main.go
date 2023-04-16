@@ -4,9 +4,11 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	dw "github.com/alessandrovaprio/tele-bot-dwl-yt/downloadHandler"
+	"github.com/alessandrovaprio/tele-bot-dwl-yt/fileHandler"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -15,6 +17,8 @@ var (
 	ytregex = regexp.MustCompile(`(http:|https:)?\/\/(www\.)?(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?`)
 	Version = "0.0.9"
 )
+var video_urls = make(map[string]string)
+var video_index = 0
 
 func checkMsgIsYoutebVideo(url string) bool {
 	return ytregex.MatchString(url)
@@ -24,8 +28,10 @@ func checkIfDownloadCommand(url string) bool {
 	return ytregex.MatchString(url) && len(splitted) > 1 && strings.Contains(splitted[0], "download")
 }
 
-func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, options []string) {
+func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, option string, video_url_key string) {
 	var chatId int64 = 0
+	// remove the key-value pair when finish
+	defer delete(video_urls, video_url_key)
 
 	if update.Message != nil {
 		chatId = update.Message.Chat.ID
@@ -47,10 +53,10 @@ func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, options []s
 	bot.Send(msg)
 	var file tgbotapi.FileBytes
 	var err error
-	if options[0] == "mp3" {
-		file, err = dw.DownloadMp3(options[1])
+	if option == "mp3" {
+		file, err = dw.DownloadMp3(option)
 	} else {
-		file, err = dw.DownloadAndConvert(options[1])
+		file, err = dw.DownloadAndConvert(option)
 	}
 
 	if err != nil {
@@ -58,10 +64,12 @@ func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, options []s
 	} else {
 		msg = tgbotapi.NewMessage(chatId, " Download Completed 👍 ✅ 🥳")
 		bot.Send(msg)
-		if options[0] == "mp3" {
+		if option == "mp3" {
 			msgMV := tgbotapi.NewAudio(chatId, file)
 			msgMV.ReplyToMessageID = update.CallbackQuery.Message.MessageID
 			bot.Send(msgMV)
+			// in any case I delete the mp3 file
+			defer fileHandler.DeleteFile(file.Name)
 		} else {
 			msgMV := tgbotapi.NewVideo(chatId, file)
 			msgMV.ReplyToMessageID = update.CallbackQuery.Message.MessageID
@@ -92,15 +100,23 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-
+			video_index = 0
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			if checkMsgIsYoutebVideo(update.Message.Text) {
+				for {
+					_, found := video_urls[strconv.Itoa(video_index)]
+					if found {
+						video_index++
+					}
+					break
+				}
+				video_urls[strconv.Itoa(video_index)] = update.Message.Text
 				log.Printf("%s", "choose a format")
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "choose a format")
 				msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 					tgbotapi.NewInlineKeyboardRow(
-						tgbotapi.NewInlineKeyboardButtonData("📽 Video (.mpeg)", "mpeg|"+update.Message.Text),
-						tgbotapi.NewInlineKeyboardButtonData("🎵 Audio (.mp3)", "mp3|"+update.Message.Text),
+						tgbotapi.NewInlineKeyboardButtonData("📽 Video (.mpeg)", "mpeg|"+strconv.Itoa(video_index)),
+						tgbotapi.NewInlineKeyboardButtonData("🎵 Audio (.mp3)", "mp3|"+strconv.Itoa(video_index)),
 					),
 				)
 				bot.Send(msg)
@@ -114,7 +130,10 @@ func main() {
 		if update.CallbackQuery != nil {
 			splitted := strings.Split(update.CallbackQuery.Data, "|")
 			if len(splitted) > 1 {
-				go doDownloadAndSend(bot, update, splitted)
+				value, found := video_urls[splitted[1]]
+				if found {
+					go doDownloadAndSend(bot, update, value, splitted[1])
+				}
 			}
 			log.Printf(update.CallbackQuery.Data)
 		}

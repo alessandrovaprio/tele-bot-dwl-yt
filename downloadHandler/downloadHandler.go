@@ -27,12 +27,11 @@ func DownloadMp3(url string) (tgbotapi.FileBytes, error) {
 	errFile := fh.CreateFile(file)
 	if errFile == nil {
 		mp3file, errConv := fh.ConvertToMp3(file)
-		fh.DeleteFile(strings.ReplaceAll(file.Name, "/", "|"))
+		defer fh.DeleteFile(strings.ReplaceAll(file.Name, "/", "|"))
 		if errConv == nil {
 			file.Bytes, err = ioutil.ReadFile(mp3file)
 			file.Name = mp3file
-			// in any case I delete the mp3 file
-			fh.DeleteFile(mp3file)
+
 		} else {
 			err = errConv
 		}
