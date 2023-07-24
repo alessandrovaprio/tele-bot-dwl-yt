@@ -30,7 +30,7 @@ func ConvertToMp3(file tgbotapi.FileBytes) (string, error) {
 
 // CreateFile creates a file
 func CreateFile(file tgbotapi.FileBytes) error {
-	localfile, errorCreateFile := os.Create(file.Name)
+	localfile, errorCreateFile := os.Create(strings.ReplaceAll(file.Name, "\"", " "))
 	if errorCreateFile != nil {
 		fmt.Println(errorCreateFile)
 	}

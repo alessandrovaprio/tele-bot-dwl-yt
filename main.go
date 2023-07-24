@@ -54,9 +54,9 @@ func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, option stri
 	var file tgbotapi.FileBytes
 	var err error
 	if option == "mp3" {
-		file, err = dw.DownloadMp3(option)
+		file, err = dw.DownloadMp3(video_url_key)
 	} else {
-		file, err = dw.DownloadAndConvert(option)
+		file, err = dw.DownloadAndConvert(video_url_key)
 	}
 
 	if err != nil {
@@ -132,7 +132,7 @@ func main() {
 			if len(splitted) > 1 {
 				value, found := video_urls[splitted[1]]
 				if found {
-					go doDownloadAndSend(bot, update, value, splitted[1])
+					go doDownloadAndSend(bot, update, splitted[0], value)
 				}
 			}
 			log.Printf(update.CallbackQuery.Data)
