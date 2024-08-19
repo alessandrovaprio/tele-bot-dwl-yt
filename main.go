@@ -89,7 +89,6 @@ func sendError(bot *tgbotapi.BotAPI, chatId int64, err error) {
 	bot.Send(msg)
 }
 func main() {
-	// bot, err := tgbotapi.NewBotAPI("5174724388:AAFRJaRe2-8ZTCElqw9fu7q6cMaaaE-nrPY")
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_KEY"))
 	if err != nil {
 		log.Panic(err)
