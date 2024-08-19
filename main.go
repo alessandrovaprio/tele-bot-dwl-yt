@@ -56,7 +56,12 @@ func doDownloadAndSend(bot *tgbotapi.BotAPI, update tgbotapi.Update, option stri
 	if option == "mp3" {
 		file, err = dw.DownloadMp3(video_url_key)
 	} else {
-		file, err = dw.DownloadAndConvert(video_url_key)
+		if strings.Contains(video_url_key, "playlist?list=") {
+			dw.DownloadPlaylist((video_url_key))
+
+		} else {
+			file, err = dw.DownloadAndConvert(video_url_key)
+		}
 	}
 
 	if err != nil {
@@ -84,6 +89,7 @@ func sendError(bot *tgbotapi.BotAPI, chatId int64, err error) {
 	bot.Send(msg)
 }
 func main() {
+	// bot, err := tgbotapi.NewBotAPI("5174724388:AAFRJaRe2-8ZTCElqw9fu7q6cMaaaE-nrPY")
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_API_KEY"))
 	if err != nil {
 		log.Panic(err)
